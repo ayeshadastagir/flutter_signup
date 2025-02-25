@@ -17,7 +17,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isFormValid = false;
+  bool _isFormValid = true; // Initially set to true
+  bool _hasAttemptedSubmit = false; // Track if user has attempted to submit
 
   @override
   void initState() {
@@ -27,8 +28,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _validateForm() {
+    if (_hasAttemptedSubmit) {
+      setState(() {
+        _isFormValid = _formKey.currentState?.validate() ?? false;
+      });
+    }
+  }
+
+  void _attemptSignIn() {
+    final isValid = _formKey.currentState?.validate() ?? false;
     setState(() {
-      _isFormValid = _formKey.currentState?.validate() ?? false;
+      _isFormValid = isValid;
+      _hasAttemptedSubmit = true;
     });
   }
 
@@ -36,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return "Email cannot be empty";
     }
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\$');
+    final RegExp emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',);
     if (!emailRegex.hasMatch(value)) {
       return "Enter a valid email";
     }
@@ -65,132 +76,125 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.whitecolor,
-      body: Column(
-        children: [
-          SizedBox(height: 20.h),
-          const Center(
-            child: Text(
-              'Login here',
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 30.h),
+            Center(
+              child: Image.asset(
+                'assets/images/login.png',
+                width: 110.w,
+                height: 110.h,
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Center(
+              child: Text(
+                "Welcome back, you've\nbeen missed!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                  color: AppColors.blackcolor,
+                ),
+              ),
+            ),
+            SizedBox(height: 40.h),
+            Form(
+              key: _formKey,
+              autovalidateMode: _hasAttemptedSubmit
+                  ? AutovalidateMode.onUserInteraction
+                  : AutovalidateMode.disabled,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 10.h),
+                      child: CustomTextField(
+                        hintText: "Email",
+                        controller: _emailController,
+                        validator: _validateEmail,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 10.h),
+                      child: CustomTextField(
+                        hintText: "Password",
+                        controller: _passwordController,
+                        isPassword: true,
+                        validator: _validatePassword,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // SizedBox(height: 10.h),
+            Align(
+              alignment: Alignment.centerRight,
+              child: CustomButton(
+                text: "Forgot your password?",
+                buttonColor: AppColors.whitecolor,
+                textColor: AppColors.bluecolor,
+                width: 220.w,
+                onPressed: () {},
+              ),
+            ),
+            SizedBox(height: 10.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: CustomButton(
+                text: "Sign in",
+                buttonColor: AppColors.bluecolor,
+                textColor: AppColors.whitecolor,
+                height: 45.h,
+                onPressed: _hasAttemptedSubmit && !_isFormValid
+                    ? null
+                    : _attemptSignIn,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            CustomButton(
+              text: "Create new account",
+              buttonColor: AppColors.whitecolor,
+              textColor: AppColors.greycolor,
+              height: 50.h,
+              onPressed: () {
+                context.go('/register');
+              },
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              "Or continue with",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 15.sp,
                 fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
                 color: AppColors.bluecolor,
               ),
             ),
-          ),
-          SizedBox(height: 20.h),
-          const Center(
-            child: Text(
-              "Welcome back, you've\nbeen missed!",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Poppins',
-                color: AppColors.blackcolor,
-              ),
+            SizedBox(height: 20.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SocialButton(
+                    iconPath: 'assets/images/google.png',
+                    onPressed: () {}),
+                SizedBox(width: 10.w),
+                SocialButton(
+                    iconPath: 'assets/images/facebook.png',
+                    onPressed: () {}),
+                SizedBox(width: 10.w),
+                SocialButton(
+                    iconPath: 'assets/images/apple.png',
+                    onPressed: () {}),
+              ],
             ),
-          ),
-          SizedBox(height: 40.h),
-          Form(
-            key: _formKey,
-            onChanged: _validateForm,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: CustomTextField(
-                      hintText: "Email",
-                      controller: _emailController,
-                      validator: _validateEmail,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: CustomTextField(
-                      hintText: "Password",
-                      controller: _passwordController,
-                      isPassword: true,
-                      validator: _validatePassword,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 10.h),
-          Align(
-            alignment: Alignment.centerRight,
-            child: CustomButton(
-              text: "Forgot your password?",
-              buttonColor: AppColors.whitecolor,
-              textColor: AppColors.bluecolor,
-              height: 22.h,
-              width: 220.w,
-              onPressed: () {},
-            ),
-          ),
-          SizedBox(height: 25.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: CustomButton(
-              text: "Sign in",
-              buttonColor: AppColors.bluecolor,
-              textColor: AppColors.whitecolor,
-              height: 45.h,
-              width: double.infinity,
-              onPressed: _isFormValid ? () {} : null,
-            ),
-          ),
-          SizedBox(height: 10.h),
-          CustomButton(
-            text: "Create new account",
-            buttonColor: AppColors.whitecolor,
-            textColor: AppColors.greycolor,
-            height: 50.h,
-            width: double.infinity,
-            onPressed: () {
-              context.go('/register');
-            },
-          ),
-          SizedBox(height: 20.h),
-          const Text(
-            "Or continue with",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15,
-              fontFamily: 'Poppins',
-              color: AppColors.bluecolor,
-            ),
-          ),
-          SizedBox(height: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SocialButton(
-                  iconPath: 'assets/images/google.png',
-                  height: 50.h,
-                  width: 50.w,
-                  onPressed: () {}),
-              SizedBox(width: 10.w),
-              SocialButton(
-                  iconPath: 'assets/images/facebook.png',
-                  height: 50.h,
-                  width: 50.w,
-                  onPressed: () {}),
-              SizedBox(width: 10.w),
-              SocialButton(
-                  iconPath: 'assets/images/apple.png',
-                  height: 50.h,
-                  width: 50.w,
-                  onPressed: () {}),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

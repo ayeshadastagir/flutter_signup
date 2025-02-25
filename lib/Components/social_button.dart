@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:signup/Utils/app_colors.dart';
 
 class SocialButton extends StatelessWidget {
@@ -10,8 +11,8 @@ class SocialButton extends StatelessWidget {
   const SocialButton({
     Key? key,
     required this.iconPath,
-    required this.height,
-    required this.width,
+    this.height = 50,
+    this.width = 50,
     this.onPressed,
   }) : super(key: key);
 
@@ -20,8 +21,8 @@ class SocialButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        height: height,
-        width: width,
+        height: height.h,
+        width: width.w,
         decoration: BoxDecoration(
           color: AppColors.lightGreyColor,
           borderRadius: BorderRadius.circular(10),

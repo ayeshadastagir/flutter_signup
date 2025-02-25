@@ -19,11 +19,30 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
   TextEditingController();
-  bool _isFormValid = false;
+  bool _isFormValid = true;
+  bool _hasAttemptedSubmit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_validateForm);
+    _passwordController.addListener(_validateForm);
+    _confirmPasswordController.addListener(_validateForm);
+  }
 
   void _validateForm() {
+    if (_hasAttemptedSubmit) {
+      setState(() {
+        _isFormValid = _formKey.currentState?.validate() ?? false;
+      });
+    }
+  }
+
+  void _attemptSignUp() {
+    final isValid = _formKey.currentState?.validate() ?? false;
     setState(() {
-      _isFormValid = _formKey.currentState?.validate() ?? false;
+      _hasAttemptedSubmit = true;
+      _isFormValid = isValid;
     });
   }
 
@@ -31,8 +50,9 @@ class _SignupScreenState extends State<SignupScreen> {
     if (value == null || value.isEmpty) {
       return 'Email is required';
     }
-    final emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\$');
+    final RegExp emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
     if (!emailRegex.hasMatch(value)) {
       return 'Enter a valid email';
     }
@@ -65,122 +85,114 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: AppColors.whitecolor,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Column(
-          children: [
-            SizedBox(height: 20.h),
-            const Center(
-              child: Text(
-                'Create Account',
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: 20.h),
+              Center(
+                child: Image.asset(
+                  'assets/images/signup.png',
+                  width: 110.w,
+                  height: 110.h,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Center(
+                child: Text(
+                  'Create an account so you can explore all the\nexisting jobs',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontFamily: 'Poppins',
+                    color: AppColors.blackcolor,
+                  ),
+                ),
+              ),
+              SizedBox(height: 40.h),
+              Form(
+                key: _formKey,
+                autovalidateMode: _hasAttemptedSubmit
+                    ? AutovalidateMode.onUserInteraction
+                    : AutovalidateMode.disabled,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 20.h),
+                      child: CustomTextField(
+                        hintText: "Email",
+                        controller: _emailController,
+                        validator: _validateEmail,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 20.h),
+                      child: CustomTextField(
+                        hintText: "Password",
+                        controller: _passwordController,
+                        isPassword: true,
+                        validator: _validatePassword,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 20.h),
+                      child: CustomTextField(
+                        hintText: "Confirm Password",
+                        controller: _confirmPasswordController,
+                        isPassword: true,
+                        validator: _validateConfirmPassword,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    CustomButton(
+                      text: "Sign up",
+                      buttonColor: AppColors.bluecolor,
+                      textColor: AppColors.whitecolor,
+                      height: 45.h,
+                      onPressed: _hasAttemptedSubmit && !_isFormValid
+                          ? null
+                          : _attemptSignUp,
+                    ),
+                  ],
+                ),
+              ),
+              CustomButton(
+                text: "Already have an account",
+                buttonColor: AppColors.whitecolor,
+                textColor: AppColors.greycolor,
+                height: 50.h,
+                onPressed: () {
+                  context.go('/login');
+                },
+              ),
+              Text(
+                "Or continue with",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 15.sp,
                   fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
                   color: AppColors.bluecolor,
                 ),
               ),
-            ),
-            SizedBox(height: 10.h),
-            const Center(
-              child: Text(
-                'Create an account so you can explore all the\nexisting jobs',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  color: AppColors.blackcolor,
-                ),
-              ),
-            ),
-            SizedBox(height: 40.h),
-            Form(
-              key: _formKey,
-              onChanged: _validateForm,
-              child: Column(
+              SizedBox(height: 20.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: CustomTextField(
-                      hintText: "Email",
-                      controller: _emailController,
-                      validator: _validateEmail,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: CustomTextField(
-                      hintText: "Password",
-                      controller: _passwordController,
-                      isPassword: true,
-                      validator: _validatePassword,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20.h),
-                    child: CustomTextField(
-                      hintText: "Confirm Password",
-                      controller: _confirmPasswordController,
-                      isPassword: true,
-                      validator: _validateConfirmPassword,
-                    ),
-                  ),
-                  SizedBox(height: 10.h),
-                  CustomButton(
-                    text: "Sign up",
-                    buttonColor: AppColors.bluecolor,
-                    textColor: AppColors.whitecolor,
-                    height: 45.h,
-                    width: double.infinity,
-                    onPressed: _isFormValid ? () {} : null,
-                  ),
+                  SocialButton(
+                      iconPath: 'assets/images/google.png',
+                      onPressed: () {}),
+                  SizedBox(width: 10.w),
+                  SocialButton(
+                      iconPath: 'assets/images/facebook.png',
+                      onPressed: () {}),
+                  SizedBox(width: 10.w),
+                  SocialButton(
+                      iconPath: 'assets/images/apple.png',
+                      onPressed: () {}),
                 ],
               ),
-            ),
-            SizedBox(height: 20.h),
-            CustomButton(
-              text: "Already have an account",
-              buttonColor: AppColors.whitecolor,
-              textColor: AppColors.greycolor,
-              height: 50.h,
-              width: double.infinity,
-              onPressed: () {
-                context.go('/login');
-              },
-            ),
-            SizedBox(height: 20.h),
-            const Text(
-              "Or continue with",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                fontFamily: 'Poppins',
-                color: AppColors.bluecolor,
-              ),
-            ),
-            SizedBox(height: 20.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SocialButton(
-                    iconPath: 'assets/images/google.png',
-                    height: 50.h,
-                    width: 50.w,
-                    onPressed: () {}),
-                SizedBox(width: 10.w),
-                SocialButton(
-                    iconPath: 'assets/images/facebook.png',
-                    height: 50.h,
-                    width: 50.w,
-                    onPressed: () {}),
-                SizedBox(width: 10.w),
-                SocialButton(
-                    iconPath: 'assets/images/apple.png',
-                    height: 50.h,
-                    width: 50.w,
-                    onPressed: () {}),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

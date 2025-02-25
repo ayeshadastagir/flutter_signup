@@ -13,65 +13,67 @@ class WelcomeScreen extends StatelessWidget {
       backgroundColor: AppColors.whitecolor,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 32.w),
-        child: Column(
-          children: [
-            SizedBox(height: 30.h),
-            Center(
-              child: Image.asset(
-                'assets/images/welcome2.png',
-                width: 310.w,
-                height: 300.h,
-                fit: BoxFit.contain,
-              ),
-            ),
-            SizedBox(height: 20.h),
-            const Text(
-              'Discover Your\nDream Job here',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 25,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                color: AppColors.bluecolor,
-              ),
-            ),
-            SizedBox(height: 15.h),
-            const Text(
-              'Explore all the existing job roles based on your\ninterest and study major',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                fontFamily: 'Poppins',
-                color: AppColors.blackcolor,
-              ),
-            ),
-            SizedBox(height: 35.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CustomButton(
-                  text: "Login",
-                  buttonColor: AppColors.bluecolor,
-                  textColor: AppColors.whitecolor,
-                  height: 50.h,
-                  width: 140.w,
-                  onPressed: () {
-                    context.go('/login');
-                  },
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: 30.h),
+              Center(
+                child: Image.asset(
+                  'assets/images/welcome2.png',
+                  width: 310.w,
+                  height: 300.h,
+                  fit: BoxFit.contain,
                 ),
-                CustomButton(
-                  text: "Register",
-                  buttonColor: AppColors.whitecolor,
-                  textColor: AppColors.blackcolor,
-                  height: 50.h,
-                  width: 140.w,
-                  onPressed: () {
-                    context.go('/register');
-                  },
+              ),
+              SizedBox(height: 20.h),
+              Text(
+                'Discover Your\nDream Job here',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.bluecolor,
                 ),
-              ],
-            ),
-          ],
+              ),
+              SizedBox(height: 15.h),
+              Text(
+                'Explore all the existing job roles based on your\ninterest and study major',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontFamily: 'Poppins',
+                  color: AppColors.blackcolor,
+                ),
+              ),
+              SizedBox(height: 35.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomButton(
+                    text: "Login",
+                    buttonColor: AppColors.bluecolor,
+                    textColor: AppColors.whitecolor,
+                    height: 50.h,
+                    width: 140.w,
+                    onPressed: () {
+                      context.go('/login');
+                    },
+                  ),
+                  CustomButton(
+                    text: "Register",
+                    buttonColor: AppColors.whitecolor,
+                    textColor: AppColors.blackcolor,
+                    height: 50.h,
+                    width: 140.w,
+                    onPressed: () {
+                      context.go('/register');
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
